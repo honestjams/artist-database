@@ -1,6 +1,7 @@
 export const dynamic = "force-dynamic";
 
 import { supabase, Artist } from "@/lib/supabase";
+import { getProfile } from "@/lib/supabase-server";
 import Nav from "@/components/Nav";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -11,13 +12,14 @@ export default async function ArtistPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const { data, error } = await supabase
-    .from("artists")
-    .select("*")
-    .eq("slug", slug)
-    .single();
+
+  const [{ data, error }, profile] = await Promise.all([
+    supabase.from("artists").select("*").eq("slug", slug).single(),
+    getProfile(),
+  ]);
 
   if (error || !data) notFound();
+  const isAdmin = profile?.role === "admin";
   const artist = data as Artist;
 
   const years =
@@ -88,21 +90,44 @@ export default async function ArtistPage({
             padding: "2rem 1.25rem 3rem",
           }}
         >
-          <Link
-            href="/"
-            style={{
-              color: "var(--text-3)",
-              fontSize: "0.82rem",
-              textDecoration: "none",
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "0.4rem",
-              marginBottom: "2rem",
-              transition: "color 0.15s",
-            }}
-          >
-            ← Back to Database
-          </Link>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "2rem", flexWrap: "wrap", gap: "0.75rem" }}>
+            <Link
+              href="/"
+              style={{
+                color: "var(--text-3)",
+                fontSize: "0.82rem",
+                textDecoration: "none",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "0.4rem",
+                transition: "color 0.15s",
+              }}
+            >
+              ← Back to Database
+            </Link>
+            {isAdmin && (
+              <Link
+                href={`/artists/${slug}/edit`}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "0.4rem",
+                  background: "rgba(232,98,58,0.15)",
+                  border: "1px solid rgba(232,98,58,0.3)",
+                  color: "#f0a07a",
+                  fontSize: "0.8rem",
+                  fontWeight: 600,
+                  padding: "0.4rem 0.85rem",
+                  borderRadius: 8,
+                  textDecoration: "none",
+                  backdropFilter: "blur(8px)",
+                  letterSpacing: "0.01em",
+                }}
+              >
+                ✎ Edit Artist
+              </Link>
+            )}
+          </div>
 
           <div
             style={{

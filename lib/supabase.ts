@@ -1,9 +1,16 @@
 import { createClient } from '@supabase/supabase-js'
+import { createBrowserClient } from '@supabase/ssr'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
+// Plain client for server components that don't need auth (public reads)
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+
+// Browser client for client components (maintains session via cookies)
+export function createSupabaseBrowserClient() {
+  return createBrowserClient(supabaseUrl, supabaseAnonKey)
+}
 
 export type Artist = {
   id: string
