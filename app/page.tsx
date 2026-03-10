@@ -28,6 +28,7 @@ const SORT_OPTIONS = [
 export default function HomePage() {
   const [artists, setArtists] = useState<Artist[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [activeStyles, setActiveStyles] = useState<string[]>([]);
   const [activeMediums, setActiveMediums] = useState<string[]>([]);
@@ -37,28 +38,35 @@ export default function HomePage() {
 
   const fetchArtists = useCallback(async () => {
     setLoading(true);
-    let query = supabase.from("artists").select("*", { count: "exact" });
+    setError(null);
+    try {
+      let query = supabase.from("artists").select("*", { count: "exact" });
 
-    if (search.trim()) {
-      query = query.ilike("name", `%${search.trim()}%`);
-    }
-    if (activeStyles.length > 0) {
-      query = query.overlaps("art_styles", activeStyles);
-    }
-    if (activeMediums.length > 0) {
-      query = query.overlaps("mediums", activeMediums);
-    }
+      if (search.trim()) {
+        const term = search.trim();
+        query = query.or(`name.ilike.%${term}%,bio.ilike.%${term}%,nationality.ilike.%${term}%`);
+      }
+      if (activeStyles.length > 0) {
+        query = query.overlaps("art_styles", activeStyles);
+      }
+      if (activeMediums.length > 0) {
+        query = query.overlaps("mediums", activeMediums);
+      }
 
-    const ascending = sort.endsWith("_asc");
-    const sortField = sort.replace(/_asc$|_desc$/, "");
-    query = query.order(sortField, { ascending, nullsFirst: false });
+      const ascending = sort.endsWith("_asc");
+      const sortField = sort.replace(/_asc$|_desc$/, "");
+      query = query.order(sortField, { ascending, nullsFirst: false });
 
-    const { data, error, count } = await query.limit(100);
-    if (!error && data) {
-      setArtists(data as Artist[]);
-      setTotal(count ?? data.length);
+      const { data, error: fetchError, count } = await query.limit(100);
+      if (fetchError) throw fetchError;
+      setArtists((data as Artist[]) ?? []);
+      setTotal(count ?? data?.length ?? 0);
+    } catch (err) {
+      console.error(err);
+      setError("Failed to load artists. Please check your connection and try again.");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, [search, activeStyles, activeMediums, sort]);
 
   useEffect(() => {
@@ -104,7 +112,7 @@ export default function HomePage() {
             Discover Artists
           </h1>
           <p style={{ color: "rgba(253,248,239,0.6)", fontFamily: "Georgia, serif", fontSize: "1.05rem", maxWidth: 480, lineHeight: 1.6, margin: 0, marginBottom: "2rem" }}>
-            Search by name, style, medium or keyword. Explore detailed profiles with bios and artwork examples.
+            Search by name, nationality, or biography. Filter by style and medium.
           </p>
 
           <div style={{ maxWidth: 600, position: "relative" }}>
@@ -114,7 +122,7 @@ export default function HomePage() {
             <input
               className="input-paper"
               type="text"
-              placeholder="Search artists, styles, movements…"
+              placeholder="Search by name, nationality, bio…"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               style={{ paddingLeft: "2.4rem", fontSize: "1rem", boxShadow: "0 4px 20px rgba(0,0,0,0.2), inset 0 2px 5px rgba(44,36,22,0.06)" }}
@@ -198,7 +206,15 @@ export default function HomePage() {
 
       {/* Grid */}
       <div style={{ maxWidth: 1280, margin: "0 auto", padding: "2rem 1.5rem" }}>
-        {loading ? (
+        {error ? (
+          <div style={{ textAlign: "center", padding: "5rem 1rem" }}>
+            <div style={{ fontSize: "3rem", marginBottom: "1rem" }}>⚠</div>
+            <p style={{ fontFamily: "Georgia, serif", fontSize: "1.1rem", color: "#a84a2a" }}>{error}</p>
+            <button onClick={fetchArtists} className="btn-primary" style={{ marginTop: "1.2rem" }}>
+              Try again
+            </button>
+          </div>
+        ) : loading ? (
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: "1.5rem" }}>
             {Array.from({ length: 8 }).map((_, i) => (
               <div key={i} style={{ height: 340, borderRadius: 8, background: "linear-gradient(145deg, #f0e8d8, #e8dcc8)", opacity: 0.7 }} />
