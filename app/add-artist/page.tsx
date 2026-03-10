@@ -27,6 +27,25 @@ function slugify(name: string) {
     .replace(/-+/g, "-");
 }
 
+function Label({ children }: { children: React.ReactNode }) {
+  return (
+    <label
+      style={{
+        display: "block",
+        fontSize: "0.7rem",
+        fontWeight: 700,
+        letterSpacing: "0.1em",
+        textTransform: "uppercase",
+        color: "var(--text-3)",
+        marginBottom: "0.5rem",
+        fontFamily: "inherit",
+      }}
+    >
+      {children}
+    </label>
+  );
+}
+
 export default function AddArtistPage() {
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
@@ -47,8 +66,14 @@ export default function AddArtistPage() {
     notable_works: "",
   });
 
-  const set = (field: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
-    setForm((f) => ({ ...f, [field]: e.target.value }));
+  const set =
+    (field: string) =>
+    (
+      e: React.ChangeEvent<
+        HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+      >
+    ) =>
+      setForm((f) => ({ ...f, [field]: e.target.value }));
 
   const toggleStyle = (s: string) =>
     setForm((f) => ({
@@ -82,29 +107,40 @@ export default function AddArtistPage() {
       .map((w) => w.trim())
       .filter(Boolean);
 
-    const { data, error: err } = await supabase.from("artists").insert({
-      name: form.name.trim(),
-      slug,
-      nationality: form.nationality.trim() || null,
-      birth_year: form.birth_year ? parseInt(form.birth_year) : null,
-      death_year: form.death_year ? parseInt(form.death_year) : null,
-      bio: form.bio.trim() || null,
-      art_styles: form.art_styles,
-      mediums: form.mediums,
-      keywords,
-      website: form.website.trim() || null,
-      image_url: form.image_url.trim() || null,
-      notable_works,
-      artwork_images: [],
-      is_user_submitted: true,
-    }).select().single();
+    const { data, error: err } = await supabase
+      .from("artists")
+      .insert({
+        name: form.name.trim(),
+        slug,
+        nationality: form.nationality.trim() || null,
+        birth_year: form.birth_year ? parseInt(form.birth_year) : null,
+        death_year: form.death_year ? parseInt(form.death_year) : null,
+        bio: form.bio.trim() || null,
+        art_styles: form.art_styles,
+        mediums: form.mediums,
+        keywords,
+        website: form.website.trim() || null,
+        image_url: form.image_url.trim() || null,
+        notable_works,
+        artwork_images: [],
+        is_user_submitted: true,
+      })
+      .select()
+      .single();
 
     if (err) {
-      setError(err.message.includes("unique") ? "An artist with this name already exists." : err.message);
+      setError(
+        err.message.includes("unique")
+          ? "An artist with this name already exists."
+          : err.message
+      );
       setSubmitting(false);
     } else {
       setSuccess(true);
-      setTimeout(() => router.push(`/artists/${(data as { slug: string }).slug}`), 1500);
+      setTimeout(
+        () => router.push(`/artists/${(data as { slug: string }).slug}`),
+        1500
+      );
     }
   };
 
@@ -112,10 +148,44 @@ export default function AddArtistPage() {
     return (
       <div style={{ minHeight: "100vh" }}>
         <Nav />
-        <div style={{ maxWidth: 600, margin: "5rem auto", padding: "0 1.5rem", textAlign: "center" }}>
-          <div style={{ fontSize: "3rem", marginBottom: "1rem" }}>✓</div>
-          <h2 style={{ fontFamily: "Georgia, serif", color: "#2c2416", marginBottom: "0.5rem" }}>Artist added!</h2>
-          <p style={{ color: "rgba(44,36,22,0.6)", fontFamily: "Georgia, serif" }}>Redirecting to their profile…</p>
+        <div
+          style={{
+            maxWidth: 480,
+            margin: "6rem auto",
+            padding: "0 1.25rem",
+            textAlign: "center",
+          }}
+        >
+          <div
+            style={{
+              width: 64,
+              height: 64,
+              borderRadius: "50%",
+              background: "rgba(122,155,106,0.15)",
+              border: "1px solid rgba(122,155,106,0.3)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              margin: "0 auto 1.5rem",
+              fontSize: "1.8rem",
+            }}
+          >
+            ✓
+          </div>
+          <h2
+            style={{
+              fontFamily: "Georgia, 'Times New Roman', serif",
+              color: "var(--text-1)",
+              fontSize: "1.5rem",
+              fontWeight: 700,
+              marginBottom: "0.5rem",
+            }}
+          >
+            Artist added!
+          </h2>
+          <p style={{ color: "var(--text-2)", fontSize: "0.9rem" }}>
+            Redirecting to their profile…
+          </p>
         </div>
       </div>
     );
@@ -125,75 +195,150 @@ export default function AddArtistPage() {
     <div style={{ minHeight: "100vh" }}>
       <Nav />
 
+      {/* Page header */}
       <div
         style={{
-          background: "linear-gradient(135deg, #2c2416 0%, #4a3728 100%)",
-          padding: "2.5rem 1.5rem",
+          padding: "2.5rem 1.25rem 2rem",
+          borderBottom: "1px solid var(--border)",
+          position: "relative",
+          overflow: "hidden",
         }}
       >
-        <div style={{ maxWidth: 760, margin: "0 auto" }}>
-          <Link href="/" style={{ color: "rgba(253,248,239,0.5)", fontFamily: "sans-serif", fontSize: "0.8rem", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "0.3rem", marginBottom: "1rem" }}>
+        <div
+          style={{
+            position: "absolute",
+            top: -80,
+            right: -80,
+            width: 300,
+            height: 300,
+            borderRadius: "50%",
+            background:
+              "radial-gradient(circle, rgba(232,98,58,0.07) 0%, transparent 70%)",
+            pointerEvents: "none",
+          }}
+        />
+        <div style={{ maxWidth: 760, margin: "0 auto", position: "relative" }}>
+          <Link
+            href="/"
+            style={{
+              color: "var(--text-3)",
+              fontSize: "0.82rem",
+              textDecoration: "none",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "0.4rem",
+              marginBottom: "1.25rem",
+              transition: "color 0.15s",
+            }}
+          >
             ← Back
           </Link>
-          <h1 style={{ color: "#fdf8ef", fontFamily: "Georgia, serif", fontSize: "clamp(1.6rem, 3vw, 2.4rem)", margin: 0 }}>
+          <h1
+            style={{
+              color: "var(--text-1)",
+              fontFamily: "Georgia, 'Times New Roman', serif",
+              fontSize: "clamp(1.7rem, 4vw, 2.5rem)",
+              fontWeight: 700,
+              letterSpacing: "-0.02em",
+              margin: 0,
+              marginBottom: "0.4rem",
+            }}
+          >
             Add an Artist
           </h1>
-          <p style={{ color: "rgba(253,248,239,0.55)", fontFamily: "Georgia, serif", fontSize: "0.95rem", marginTop: "0.5rem" }}>
+          <p style={{ color: "var(--text-2)", fontSize: "0.92rem" }}>
             Contribute to the database by adding an artist you love.
           </p>
         </div>
       </div>
 
-      <div style={{ maxWidth: 760, margin: "2.5rem auto", padding: "0 1.5rem" }}>
+      {/* Form */}
+      <div
+        style={{ maxWidth: 760, margin: "2rem auto 0", padding: "0 1.25rem 5rem" }}
+      >
         <form onSubmit={handleSubmit}>
-          <div style={{ display: "flex", flexDirection: "column", gap: "1.8rem" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
 
             {/* Name */}
             <div>
-              <label style={{ display: "block", fontFamily: "sans-serif", fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(44,36,22,0.55)", marginBottom: "0.4rem" }}>
-                Artist Name *
-              </label>
-              <input className="input-paper" type="text" placeholder="e.g. Frida Kahlo" value={form.name} onChange={set("name")} required />
+              <Label>Artist Name *</Label>
+              <input
+                className="input-dark"
+                type="text"
+                placeholder="e.g. Frida Kahlo"
+                value={form.name}
+                onChange={set("name")}
+                required
+              />
             </div>
 
             {/* Nationality + Years */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1rem" }}>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
+                gap: "1rem",
+              }}
+            >
               <div>
-                <label style={{ display: "block", fontFamily: "sans-serif", fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(44,36,22,0.55)", marginBottom: "0.4rem" }}>
-                  Nationality
-                </label>
-                <input className="input-paper" type="text" placeholder="e.g. Mexican" value={form.nationality} onChange={set("nationality")} />
+                <Label>Nationality</Label>
+                <input
+                  className="input-dark"
+                  type="text"
+                  placeholder="e.g. Mexican"
+                  value={form.nationality}
+                  onChange={set("nationality")}
+                />
               </div>
               <div>
-                <label style={{ display: "block", fontFamily: "sans-serif", fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(44,36,22,0.55)", marginBottom: "0.4rem" }}>
-                  Birth Year
-                </label>
-                <input className="input-paper" type="number" placeholder="e.g. 1907" value={form.birth_year} onChange={set("birth_year")} min={1000} max={2025} />
+                <Label>Birth Year</Label>
+                <input
+                  className="input-dark"
+                  type="number"
+                  placeholder="e.g. 1907"
+                  value={form.birth_year}
+                  onChange={set("birth_year")}
+                  min={1000}
+                  max={2025}
+                />
               </div>
               <div>
-                <label style={{ display: "block", fontFamily: "sans-serif", fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(44,36,22,0.55)", marginBottom: "0.4rem" }}>
-                  Death Year
-                </label>
-                <input className="input-paper" type="number" placeholder="Leave blank if living" value={form.death_year} onChange={set("death_year")} min={1000} max={2025} />
+                <Label>Death Year</Label>
+                <input
+                  className="input-dark"
+                  type="number"
+                  placeholder="Leave blank if living"
+                  value={form.death_year}
+                  onChange={set("death_year")}
+                  min={1000}
+                  max={2025}
+                />
               </div>
             </div>
 
-            {/* Bio */}
+            {/* Biography */}
             <div>
-              <label style={{ display: "block", fontFamily: "sans-serif", fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(44,36,22,0.55)", marginBottom: "0.4rem" }}>
-                Biography
-              </label>
-              <textarea className="input-paper" placeholder="Write a biography of the artist — their life, influences, and legacy…" value={form.bio} onChange={set("bio")} style={{ minHeight: 140 }} />
+              <Label>Biography</Label>
+              <textarea
+                className="input-dark"
+                placeholder="Write about the artist — their life, influences, and legacy…"
+                value={form.bio}
+                onChange={set("bio")}
+                style={{ minHeight: 150 }}
+              />
             </div>
 
-            {/* Styles */}
+            {/* Art Styles */}
             <div>
-              <label style={{ display: "block", fontFamily: "sans-serif", fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(44,36,22,0.55)", marginBottom: "0.6rem" }}>
-                Art Styles / Movements
-              </label>
+              <Label>Art Styles / Movements</Label>
               <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>
                 {STYLE_OPTIONS.map((s) => (
-                  <button key={s} type="button" onClick={() => toggleStyle(s)} className={`filter-pill ${form.art_styles.includes(s) ? "active" : ""}`}>
+                  <button
+                    key={s}
+                    type="button"
+                    onClick={() => toggleStyle(s)}
+                    className={`pill ${form.art_styles.includes(s) ? "active" : ""}`}
+                  >
                     {s}
                   </button>
                 ))}
@@ -202,12 +347,15 @@ export default function AddArtistPage() {
 
             {/* Mediums */}
             <div>
-              <label style={{ display: "block", fontFamily: "sans-serif", fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(44,36,22,0.55)", marginBottom: "0.6rem" }}>
-                Mediums
-              </label>
+              <Label>Mediums</Label>
               <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>
                 {MEDIUM_OPTIONS.map((m) => (
-                  <button key={m} type="button" onClick={() => toggleMedium(m)} className={`filter-pill ${form.mediums.includes(m) ? "active" : ""}`}>
+                  <button
+                    key={m}
+                    type="button"
+                    onClick={() => toggleMedium(m)}
+                    className={`pill ${form.mediums.includes(m) ? "active" : ""}`}
+                  >
                     {m}
                   </button>
                 ))}
@@ -216,47 +364,111 @@ export default function AddArtistPage() {
 
             {/* Keywords */}
             <div>
-              <label style={{ display: "block", fontFamily: "sans-serif", fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(44,36,22,0.55)", marginBottom: "0.4rem" }}>
-                Keywords
-              </label>
-              <input className="input-paper" type="text" placeholder="Comma separated — e.g. feminism, self-portrait, Mexico, colour" value={form.keywords} onChange={set("keywords")} />
+              <Label>Keywords</Label>
+              <input
+                className="input-dark"
+                type="text"
+                placeholder="Comma separated — e.g. feminism, self-portrait, Mexico"
+                value={form.keywords}
+                onChange={set("keywords")}
+              />
             </div>
 
             {/* Notable works */}
             <div>
-              <label style={{ display: "block", fontFamily: "sans-serif", fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(44,36,22,0.55)", marginBottom: "0.4rem" }}>
-                Notable Works
-              </label>
-              <textarea className="input-paper" placeholder="One work per line — e.g. The Two Fridas (1939)" value={form.notable_works} onChange={set("notable_works")} style={{ minHeight: 100 }} />
+              <Label>Notable Works</Label>
+              <textarea
+                className="input-dark"
+                placeholder="One work per line — e.g. The Two Fridas (1939)"
+                value={form.notable_works}
+                onChange={set("notable_works")}
+                style={{ minHeight: 110 }}
+              />
             </div>
 
-            {/* Portrait URL */}
-            <div>
-              <label style={{ display: "block", fontFamily: "sans-serif", fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(44,36,22,0.55)", marginBottom: "0.4rem" }}>
-                Portrait Image URL
-              </label>
-              <input className="input-paper" type="url" placeholder="https://…" value={form.image_url} onChange={set("image_url")} />
+            {/* Divider */}
+            <div
+              style={{
+                borderTop: "1px solid var(--border)",
+                paddingTop: "0.5rem",
+              }}
+            >
+              <p
+                style={{
+                  fontSize: "0.72rem",
+                  fontWeight: 700,
+                  letterSpacing: "0.1em",
+                  textTransform: "uppercase",
+                  color: "var(--text-3)",
+                  marginBottom: "1.5rem",
+                }}
+              >
+                Optional Links
+              </p>
+              <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+                <div>
+                  <Label>Portrait Image URL</Label>
+                  <input
+                    className="input-dark"
+                    type="url"
+                    placeholder="https://upload.wikimedia.org/…"
+                    value={form.image_url}
+                    onChange={set("image_url")}
+                  />
+                  <p
+                    style={{
+                      fontSize: "0.73rem",
+                      color: "var(--text-3)",
+                      marginTop: "0.4rem",
+                    }}
+                  >
+                    Wikimedia Commons images work well
+                  </p>
+                </div>
+                <div>
+                  <Label>Website</Label>
+                  <input
+                    className="input-dark"
+                    type="url"
+                    placeholder="https://…"
+                    value={form.website}
+                    onChange={set("website")}
+                  />
+                </div>
+              </div>
             </div>
 
-            {/* Website */}
-            <div>
-              <label style={{ display: "block", fontFamily: "sans-serif", fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(44,36,22,0.55)", marginBottom: "0.4rem" }}>
-                Website
-              </label>
-              <input className="input-paper" type="url" placeholder="https://…" value={form.website} onChange={set("website")} />
-            </div>
-
+            {/* Error */}
             {error && (
-              <div style={{ background: "rgba(168,74,42,0.08)", border: "1px solid rgba(168,74,42,0.25)", borderRadius: 6, padding: "0.8rem 1rem", color: "#a84a2a", fontFamily: "Georgia, serif", fontSize: "0.9rem" }}>
+              <div
+                style={{
+                  background: "rgba(232,98,58,0.08)",
+                  border: "1px solid rgba(232,98,58,0.2)",
+                  borderRadius: 10,
+                  padding: "0.85rem 1rem",
+                  color: "#f0a07a",
+                  fontSize: "0.88rem",
+                }}
+              >
                 {error}
               </div>
             )}
 
-            <div style={{ display: "flex", gap: "1rem", paddingBottom: "3rem" }}>
-              <button type="submit" className="btn-primary" disabled={submitting} style={{ opacity: submitting ? 0.7 : 1 }}>
+            {/* Actions */}
+            <div style={{ display: "flex", gap: "0.75rem" }}>
+              <button
+                type="submit"
+                className="btn-primary"
+                disabled={submitting}
+                style={{
+                  opacity: submitting ? 0.65 : 1,
+                  padding: "0.7rem 1.75rem",
+                  fontSize: "0.92rem",
+                }}
+              >
                 {submitting ? "Submitting…" : "Add to Database"}
               </button>
-              <Link href="/" className="btn-secondary">
+              <Link href="/" className="btn-ghost" style={{ padding: "0.7rem 1.25rem" }}>
                 Cancel
               </Link>
             </div>
