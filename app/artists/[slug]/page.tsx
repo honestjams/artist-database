@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { supabase, Artist } from "@/lib/supabase";
 import Nav from "@/components/Nav";
 import Link from "next/link";
