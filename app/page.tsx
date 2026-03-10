@@ -18,23 +18,23 @@ const ALL_MEDIUMS = [
 ];
 
 const SORT_OPTIONS = [
-  { value: "name_asc", label: "Name A–Z" },
-  { value: "name_desc", label: "Name Z–A" },
-  { value: "birth_year_asc", label: "Oldest First" },
-  { value: "birth_year_desc", label: "Newest First" },
-  { value: "created_at_desc", label: "Recently Added" },
+  { value: "name_asc",        label: "Name A–Z" },
+  { value: "name_desc",       label: "Name Z–A" },
+  { value: "birth_year_asc",  label: "Oldest first" },
+  { value: "birth_year_desc", label: "Newest first" },
+  { value: "created_at_desc", label: "Recently added" },
 ];
 
 export default function HomePage() {
-  const [artists, setArtists] = useState<Artist[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [search, setSearch] = useState("");
-  const [activeStyles, setActiveStyles] = useState<string[]>([]);
+  const [artists, setArtists]             = useState<Artist[]>([]);
+  const [loading, setLoading]             = useState(true);
+  const [error, setError]                 = useState<string | null>(null);
+  const [search, setSearch]               = useState("");
+  const [activeStyles, setActiveStyles]   = useState<string[]>([]);
   const [activeMediums, setActiveMediums] = useState<string[]>([]);
-  const [sort, setSort] = useState("name_asc");
-  const [total, setTotal] = useState(0);
-  const [showFilters, setShowFilters] = useState(false);
+  const [sort, setSort]                   = useState("name_asc");
+  const [total, setTotal]                 = useState(0);
+  const [showFilters, setShowFilters]     = useState(false);
 
   const fetchArtists = useCallback(async () => {
     setLoading(true);
@@ -44,14 +44,12 @@ export default function HomePage() {
 
       if (search.trim()) {
         const term = search.trim();
-        query = query.or(`name.ilike.%${term}%,bio.ilike.%${term}%,nationality.ilike.%${term}%`);
+        query = query.or(
+          `name.ilike.%${term}%,bio.ilike.%${term}%,nationality.ilike.%${term}%`
+        );
       }
-      if (activeStyles.length > 0) {
-        query = query.overlaps("art_styles", activeStyles);
-      }
-      if (activeMediums.length > 0) {
-        query = query.overlaps("mediums", activeMediums);
-      }
+      if (activeStyles.length > 0) query = query.overlaps("art_styles", activeStyles);
+      if (activeMediums.length > 0) query = query.overlaps("mediums", activeMediums);
 
       const ascending = sort.endsWith("_asc");
       const sortField = sort.replace(/_asc$|_desc$/, "");
@@ -90,151 +88,297 @@ export default function HomePage() {
     setSearch("");
   };
 
-  const hasFilters = activeStyles.length > 0 || activeMediums.length > 0 || search.trim();
+  const hasFilters =
+    activeStyles.length > 0 || activeMediums.length > 0 || search.trim();
 
   return (
     <div style={{ minHeight: "100vh" }}>
       <Nav />
 
-      {/* Hero */}
+      {/* ── Hero ─────────────────────────────────────────── */}
       <div
-        className="gradient-hero"
-        style={{ padding: "4rem 1.5rem 3.5rem", position: "relative", overflow: "hidden" }}
+        style={{
+          padding: "clamp(2.5rem, 8vw, 5rem) 1.25rem 2rem",
+          position: "relative",
+          overflow: "hidden",
+        }}
       >
-        <div style={{ position: "absolute", top: -60, right: -60, width: 320, height: 320, borderRadius: "50%", background: "rgba(201,146,42,0.12)", pointerEvents: "none" }} />
-        <div style={{ position: "absolute", bottom: -40, left: "20%", width: 200, height: 200, borderRadius: "50%", background: "rgba(196,98,58,0.1)", pointerEvents: "none" }} />
+        <div
+          style={{
+            position: "absolute",
+            top: -120,
+            right: -100,
+            width: 500,
+            height: 500,
+            borderRadius: "50%",
+            background: "radial-gradient(circle, rgba(232,98,58,0.1) 0%, transparent 70%)",
+            pointerEvents: "none",
+          }}
+        />
+        <div
+          style={{
+            position: "absolute",
+            bottom: -60,
+            left: "10%",
+            width: 350,
+            height: 350,
+            borderRadius: "50%",
+            background: "radial-gradient(circle, rgba(212,168,67,0.08) 0%, transparent 70%)",
+            pointerEvents: "none",
+          }}
+        />
 
         <div style={{ maxWidth: 1280, margin: "0 auto", position: "relative" }}>
-          <p style={{ color: "rgba(253,248,239,0.55)", fontFamily: "sans-serif", fontSize: "0.75rem", letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: "0.8rem" }}>
+          <p
+            style={{
+              color: "var(--orange)",
+              fontSize: "0.7rem",
+              fontWeight: 700,
+              letterSpacing: "0.18em",
+              textTransform: "uppercase",
+              marginBottom: "1rem",
+            }}
+          >
             Visual Artist Directory
           </p>
-          <h1 className="display-title" style={{ color: "#fdf8ef", margin: 0, marginBottom: "0.5rem" }}>
-            Discover Artists
+          <h1
+            style={{
+              fontSize: "clamp(2.6rem, 7vw, 5.5rem)",
+              fontWeight: 800,
+              letterSpacing: "-0.03em",
+              lineHeight: 1.04,
+              color: "var(--text-1)",
+              margin: 0,
+              marginBottom: "1rem",
+              fontFamily: "Georgia, 'Times New Roman', serif",
+            }}
+          >
+            Discover<br />Artists
           </h1>
-          <p style={{ color: "rgba(253,248,239,0.6)", fontFamily: "Georgia, serif", fontSize: "1.05rem", maxWidth: 480, lineHeight: 1.6, margin: 0, marginBottom: "2rem" }}>
-            Search by name, nationality, or biography. Filter by style and medium.
+          <p
+            style={{
+              color: "var(--text-2)",
+              fontSize: "1rem",
+              maxWidth: 440,
+              lineHeight: 1.7,
+              margin: 0,
+              marginBottom: "2.5rem",
+            }}
+          >
+            Explore artists across history, movements, and mediums — from the
+            Renaissance to the present day.
           </p>
 
-          <div style={{ maxWidth: 600, position: "relative" }}>
-            <span style={{ position: "absolute", left: "1rem", top: "50%", transform: "translateY(-50%)", color: "rgba(44,36,22,0.4)", fontSize: "1.1rem", pointerEvents: "none" }}>
-              ⌕
+          {/* Search */}
+          <div style={{ maxWidth: 560, position: "relative" }}>
+            <span
+              style={{
+                position: "absolute",
+                left: "1rem",
+                top: "50%",
+                transform: "translateY(-50%)",
+                color: "var(--text-3)",
+                pointerEvents: "none",
+                lineHeight: 1,
+                display: "flex",
+              }}
+            >
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <circle cx="7" cy="7" r="5" stroke="currentColor" strokeWidth="1.5"/>
+                <path d="M11 11l3 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+              </svg>
             </span>
             <input
-              className="input-paper"
+              className="input-dark"
               type="text"
-              placeholder="Search by name, nationality, bio…"
+              placeholder="Search artists, styles, or nationality…"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              style={{ paddingLeft: "2.4rem", fontSize: "1rem", boxShadow: "0 4px 20px rgba(0,0,0,0.2), inset 0 2px 5px rgba(44,36,22,0.06)" }}
+              style={{ paddingLeft: "2.6rem", fontSize: "0.95rem", height: 48, borderRadius: 14 }}
             />
+            {search && (
+              <button
+                onClick={() => setSearch("")}
+                style={{
+                  position: "absolute",
+                  right: "0.75rem",
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  background: "none",
+                  border: "none",
+                  color: "var(--text-3)",
+                  cursor: "pointer",
+                  fontSize: "1rem",
+                  lineHeight: 1,
+                  padding: "0.25rem",
+                  fontFamily: "inherit",
+                }}
+              >
+                ✕
+              </button>
+            )}
           </div>
         </div>
       </div>
 
-      {/* Filter bar */}
-      <div style={{ background: "linear-gradient(90deg, #f0e8d8, #e8dcc8)", borderBottom: "1px solid rgba(44,36,22,0.1)", padding: "0.9rem 1.5rem", position: "sticky", top: 60, zIndex: 50, boxShadow: "0 2px 8px rgba(44,36,22,0.08)" }}>
-        <div style={{ maxWidth: 1280, margin: "0 auto", display: "flex", alignItems: "center", gap: "0.8rem", flexWrap: "wrap" }}>
-          <button
-            onClick={() => setShowFilters(!showFilters)}
-            style={{
-              background: showFilters ? "linear-gradient(145deg, #c4623a, #a84a2a)" : "linear-gradient(145deg, #e8dcc8, #d8ccb4)",
-              color: showFilters ? "white" : "#2c2416",
-              border: "1px solid rgba(44,36,22,0.15)",
-              borderRadius: 4, padding: "0.35rem 0.85rem",
-              fontFamily: "Georgia, serif", fontSize: "0.85rem", cursor: "pointer",
-              boxShadow: "0 2px 4px rgba(0,0,0,0.08)",
-              display: "flex", alignItems: "center", gap: "0.3rem",
-            }}
-          >
-            ⧗ Filters
-            {(activeStyles.length > 0 || activeMediums.length > 0) && (
-              <span style={{ background: "rgba(255,255,255,0.3)", borderRadius: "50%", width: 18, height: 18, display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: "0.7rem", fontFamily: "sans-serif", fontWeight: 700 }}>
-                {activeStyles.length + activeMediums.length}
-              </span>
-            )}
-          </button>
+      {/* ── Filter bar ───────────────────────────────────── */}
+      <div
+        style={{
+          position: "sticky",
+          top: 56,
+          zIndex: 50,
+          background: "rgba(13,12,16,0.88)",
+          backdropFilter: "blur(20px)",
+          WebkitBackdropFilter: "blur(20px)",
+          borderBottom: "1px solid var(--border)",
+        }}
+      >
+        <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0.65rem 1.25rem" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className={`pill ${showFilters || activeStyles.length + activeMediums.length > 0 ? "active" : ""}`}
+              style={{ flexShrink: 0 }}
+            >
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path d="M1 3h10M3 6h6M5 9h2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+              </svg>
+              Filters
+              {activeStyles.length + activeMediums.length > 0 && (
+                <span
+                  style={{
+                    background: "rgba(255,255,255,0.3)",
+                    borderRadius: "50%",
+                    width: 16,
+                    height: 16,
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: "0.62rem",
+                    fontWeight: 800,
+                  }}
+                >
+                  {activeStyles.length + activeMediums.length}
+                </span>
+              )}
+            </button>
 
-          <div style={{ width: 1, height: 24, background: "rgba(44,36,22,0.15)" }} />
+            <div style={{ width: 1, height: 20, background: "var(--border)", flexShrink: 0 }} />
 
-          <select className="input-paper" value={sort} onChange={(e) => setSort(e.target.value)} style={{ width: "auto", padding: "0.35rem 2.2rem 0.35rem 0.7rem", fontSize: "0.85rem" }}>
-            {SORT_OPTIONS.map((o) => (
-              <option key={o.value} value={o.value}>{o.label}</option>
-            ))}
-          </select>
-
-          <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "0.6rem" }}>
-            {hasFilters && (
-              <button onClick={clearFilters} style={{ background: "none", border: "none", color: "#a84a2a", fontFamily: "Georgia, serif", fontSize: "0.82rem", cursor: "pointer", textDecoration: "underline", padding: 0 }}>
-                Clear all
-              </button>
-            )}
-            <span style={{ fontFamily: "sans-serif", fontSize: "0.8rem", color: "rgba(44,36,22,0.5)" }}>
-              {loading ? "Loading…" : `${total} artist${total !== 1 ? "s" : ""}`}
-            </span>
-          </div>
-        </div>
-
-        {showFilters && (
-          <div style={{ maxWidth: 1280, margin: "0.9rem auto 0", paddingTop: "0.9rem", borderTop: "1px solid rgba(44,36,22,0.1)" }}>
-            <div style={{ marginBottom: "0.7rem" }}>
-              <p style={{ margin: "0 0 0.4rem", fontSize: "0.72rem", fontFamily: "sans-serif", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(44,36,22,0.5)" }}>
-                Style / Movement
-              </p>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>
-                {ALL_STYLES.map((s) => (
-                  <button key={s} onClick={() => toggleStyle(s)} className={`filter-pill ${activeStyles.includes(s) ? "active" : ""}`}>
-                    {s}
-                  </button>
-                ))}
-              </div>
+            <div className="scroll-x" style={{ display: "flex", gap: "0.35rem", flex: 1 }}>
+              {ALL_STYLES.map((s) => (
+                <button
+                  key={s}
+                  onClick={() => toggleStyle(s)}
+                  className={`pill ${activeStyles.includes(s) ? "active" : ""}`}
+                >
+                  {s}
+                </button>
+              ))}
             </div>
-            <div>
-              <p style={{ margin: "0 0 0.4rem", fontSize: "0.72rem", fontFamily: "sans-serif", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(44,36,22,0.5)" }}>
+
+            <div style={{ width: 1, height: 20, background: "var(--border)", flexShrink: 0 }} />
+
+            <select
+              className="input-dark"
+              value={sort}
+              onChange={(e) => setSort(e.target.value)}
+              style={{
+                width: "auto",
+                padding: "0.3rem 2rem 0.3rem 0.7rem",
+                fontSize: "0.78rem",
+                height: 34,
+                borderRadius: 8,
+                flexShrink: 0,
+              }}
+            >
+              {SORT_OPTIONS.map((o) => (
+                <option key={o.value} value={o.value}>{o.label}</option>
+              ))}
+            </select>
+          </div>
+
+          {showFilters && (
+            <div style={{ marginTop: "0.65rem", paddingTop: "0.65rem", borderTop: "1px solid var(--border)" }}>
+              <p style={{ margin: "0 0 0.45rem", fontSize: "0.67rem", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-3)" }}>
                 Medium
               </p>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "0.35rem" }}>
                 {ALL_MEDIUMS.map((m) => (
-                  <button key={m} onClick={() => toggleMedium(m)} className={`filter-pill ${activeMediums.includes(m) ? "active" : ""}`}>
+                  <button
+                    key={m}
+                    onClick={() => toggleMedium(m)}
+                    className={`pill ${activeMediums.includes(m) ? "active" : ""}`}
+                  >
                     {m}
                   </button>
                 ))}
               </div>
             </div>
+          )}
+
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "0.5rem" }}>
+            <span style={{ fontSize: "0.73rem", color: "var(--text-3)" }}>
+              {loading ? "Loading…" : `${total} artist${total !== 1 ? "s" : ""}`}
+            </span>
+            {hasFilters && (
+              <button
+                onClick={clearFilters}
+                style={{ background: "none", border: "none", color: "var(--orange)", fontSize: "0.73rem", cursor: "pointer", padding: 0, fontFamily: "inherit" }}
+              >
+                Clear all
+              </button>
+            )}
           </div>
-        )}
+        </div>
       </div>
 
-      {/* Grid */}
-      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "2rem 1.5rem" }}>
+      {/* ── Grid ─────────────────────────────────────────── */}
+      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "2rem 1.25rem 5rem" }}>
         {error ? (
-          <div style={{ textAlign: "center", padding: "5rem 1rem" }}>
-            <div style={{ fontSize: "3rem", marginBottom: "1rem" }}>⚠</div>
-            <p style={{ fontFamily: "Georgia, serif", fontSize: "1.1rem", color: "#a84a2a" }}>{error}</p>
-            <button onClick={fetchArtists} className="btn-primary" style={{ marginTop: "1.2rem" }}>
-              Try again
-            </button>
+          <div style={{ textAlign: "center", padding: "6rem 1rem" }}>
+            <div style={{ fontSize: "2.5rem", marginBottom: "1rem", opacity: 0.4 }}>⚠</div>
+            <p style={{ color: "var(--text-2)", fontSize: "1rem", marginBottom: "1.5rem" }}>{error}</p>
+            <button onClick={fetchArtists} className="btn-primary">Try again</button>
           </div>
         ) : loading ? (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: "1.5rem" }}>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 280px), 1fr))",
+              gap: "1.25rem",
+            }}
+          >
             {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} style={{ height: 340, borderRadius: 8, background: "linear-gradient(145deg, #f0e8d8, #e8dcc8)", opacity: 0.7 }} />
+              <div key={i} className="skeleton" style={{ height: 380, animationDelay: `${i * 0.06}s` }} />
             ))}
           </div>
         ) : artists.length === 0 ? (
-          <div style={{ textAlign: "center", padding: "5rem 1rem", color: "rgba(44,36,22,0.4)" }}>
-            <div style={{ fontSize: "3rem", marginBottom: "1rem" }}>◈</div>
-            <p style={{ fontFamily: "Georgia, serif", fontSize: "1.1rem" }}>No artists found</p>
-            <p style={{ fontSize: "0.9rem", marginTop: "0.5rem" }}>Try adjusting your search or filters</p>
+          <div style={{ textAlign: "center", padding: "6rem 1rem" }}>
+            <div style={{ fontSize: "3rem", marginBottom: "1rem", opacity: 0.2 }}>◈</div>
+            <p style={{ color: "var(--text-2)", fontSize: "1.05rem", marginBottom: "0.5rem" }}>No artists found</p>
+            <p style={{ color: "var(--text-3)", fontSize: "0.88rem" }}>Try adjusting your search or filters</p>
             {hasFilters && (
-              <button onClick={clearFilters} className="btn-primary" style={{ marginTop: "1.2rem" }}>
+              <button onClick={clearFilters} className="btn-primary" style={{ marginTop: "1.5rem" }}>
                 Clear filters
               </button>
             )}
           </div>
         ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: "1.5rem" }}>
-            {artists.map((artist) => (
-              <ArtistCard key={artist.id} artist={artist} />
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 280px), 1fr))",
+              gap: "1.25rem",
+            }}
+          >
+            {artists.map((artist, i) => (
+              <div
+                key={artist.id}
+                style={{ animation: `fadeUp 0.4s cubic-bezier(0.22,1,0.36,1) ${Math.min(i * 0.04, 0.3)}s both` }}
+              >
+                <ArtistCard artist={artist} />
+              </div>
             ))}
           </div>
         )}
