@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Nav from "@/components/Nav";
 import { supabase, Category } from "@/lib/supabase";
@@ -17,11 +17,17 @@ function Label({ children }: { children: React.ReactNode }) {
   );
 }
 
+const ACCEPTED_TYPES = "image/jpeg,image/png,image/gif,image/webp,image/avif,image/tiff,image/bmp,image/svg+xml,image/heic,image/heif";
+const MAX_FILE_MB = 10;
+
 export default function AddArtistPage() {
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [uploadingPortrait, setUploadingPortrait] = useState(false);
+  const [portraitPreview, setPortraitPreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [styleOptions, setStyleOptions]     = useState<string[]>([]);
   const [mediumOptions, setMediumOptions]   = useState<string[]>([]);
@@ -52,6 +58,30 @@ export default function AddArtistPage() {
       ...f,
       [field]: f[field].includes(val) ? f[field].filter(x => x !== val) : [...f[field], val],
     }));
+
+  const handlePortraitUpload = async (file: File) => {
+    if (file.size > MAX_FILE_MB * 1024 * 1024) {
+      setError(`File too large. Maximum size is ${MAX_FILE_MB} MB.`);
+      return;
+    }
+    setUploadingPortrait(true);
+    setError(null);
+    const preview = URL.createObjectURL(file);
+    setPortraitPreview(preview);
+    const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
+    const slug = slugify(form.name || "artist");
+    const path = `portraits/${slug}-${Date.now()}.${ext}`;
+    const { error: upErr } = await supabase.storage.from("artist-images").upload(path, file, { upsert: true });
+    if (upErr) {
+      setError(`Upload failed: ${upErr.message}`);
+      setPortraitPreview(null);
+      setUploadingPortrait(false);
+      return;
+    }
+    const { data: { publicUrl } } = supabase.storage.from("artist-images").getPublicUrl(path);
+    setForm(f => ({ ...f, image_url: publicUrl }));
+    setUploadingPortrait(false);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -197,8 +227,54 @@ export default function AddArtistPage() {
               <p style={{ fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-3)", marginBottom: "1.5rem" }}>Optional Links</p>
               <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
                 <div>
-                  <Label>Portrait Image URL</Label>
-                  <input className="input-dark" type="url" placeholder="https://upload.wikimedia.org/…" value={form.image_url} onChange={set("image_url")} />
+                  <Label>Portrait Image</Label>
+
+                  {/* Upload button */}
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept={ACCEPTED_TYPES}
+                    style={{ display: "none" }}
+                    onChange={e => { const f = e.target.files?.[0]; if (f) handlePortraitUpload(f); }}
+                  />
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.75rem" }}>
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={uploadingPortrait}
+                      style={{
+                        padding: "0.55rem 1.1rem",
+                        background: "var(--bg-2, rgba(255,255,255,0.06))",
+                        border: "1px solid var(--border)",
+                        borderRadius: 8,
+                        color: "var(--text-2)",
+                        fontSize: "0.85rem",
+                        cursor: uploadingPortrait ? "not-allowed" : "pointer",
+                        fontFamily: "inherit",
+                        opacity: uploadingPortrait ? 0.65 : 1,
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {uploadingPortrait ? "Uploading…" : "↑ Upload Image"}
+                    </button>
+                    {portraitPreview && (
+                      <img
+                        src={portraitPreview}
+                        alt="Portrait preview"
+                        style={{ width: 48, height: 60, objectFit: "cover", borderRadius: 6, border: "1px solid var(--border)" }}
+                      />
+                    )}
+                    {form.image_url && !uploadingPortrait && portraitPreview && (
+                      <span style={{ fontSize: "0.75rem", color: "#7a9b6a" }}>✓ Uploaded</span>
+                    )}
+                  </div>
+                  <p style={{ fontSize: "0.72rem", color: "var(--text-3)", marginBottom: "0.75rem", lineHeight: 1.5 }}>
+                    Accepted: JPG, PNG, GIF, WebP, AVIF, TIFF, BMP, SVG, HEIC · Max {MAX_FILE_MB} MB · Recommended: 400 × 500 px (portrait orientation)
+                  </p>
+
+                  {/* URL fallback */}
+                  <Label>Or paste an image URL</Label>
+                  <input className="input-dark" type="url" placeholder="https://upload.wikimedia.org/…" value={form.image_url} onChange={e => { setPortraitPreview(null); set("image_url")(e); }} />
                   <p style={{ fontSize: "0.73rem", color: "var(--text-3)", marginTop: "0.4rem" }}>Wikimedia Commons images work well</p>
                 </div>
                 <div>
