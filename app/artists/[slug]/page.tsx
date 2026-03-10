@@ -366,21 +366,13 @@ export default async function ArtistPage({
                   {artist.artwork_images.map((url, i) => (
                     <div
                       key={i}
+                      className="artwork-thumb"
                       style={{
                         aspectRatio: "4/3",
                         borderRadius: 12,
                         overflow: "hidden",
                         border: "1px solid var(--border)",
                         background: "var(--surface-2)",
-                        transition: "transform 0.25s ease, box-shadow 0.25s ease",
-                      }}
-                      onMouseEnter={(e) => {
-                        (e.currentTarget as HTMLDivElement).style.transform = "scale(1.02)";
-                        (e.currentTarget as HTMLDivElement).style.boxShadow = "0 12px 32px rgba(0,0,0,0.4)";
-                      }}
-                      onMouseLeave={(e) => {
-                        (e.currentTarget as HTMLDivElement).style.transform = "scale(1)";
-                        (e.currentTarget as HTMLDivElement).style.boxShadow = "none";
                       }}
                     >
                       {/* eslint-disable-next-line @next/next/no-img-element */}

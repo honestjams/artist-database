@@ -283,6 +283,15 @@ select.input-dark {
   animation: fadeUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
+/* ─── Artwork thumbnail hover ────────────────────── */
+.artwork-thumb {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.artwork-thumb:hover {
+  transform: scale(1.03);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+}
+
 /* ─── Horizontal scroll (hide scrollbar) ────────── */
 .scroll-x {
   overflow-x: auto;
