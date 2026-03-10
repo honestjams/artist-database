@@ -250,13 +250,17 @@ export default async function ArtistPage({
               )}
 
               {artist.mediums?.length > 0 && (
-                <div
-                  style={{ display: "flex", flexWrap: "wrap", gap: "0.35rem" }}
-                >
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "0.35rem", marginBottom: artist.concepts?.length > 0 ? "0.5rem" : 0 }}>
                   {artist.mediums.map((m) => (
-                    <span key={m} className="tag tag-medium">
-                      {m}
-                    </span>
+                    <span key={m} className="tag tag-medium">{m}</span>
+                  ))}
+                </div>
+              )}
+
+              {artist.concepts?.length > 0 && (
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "0.35rem" }}>
+                  {artist.concepts.map((c) => (
+                    <span key={c} className="tag tag-concept">{c}</span>
                   ))}
                 </div>
               )}
@@ -494,6 +498,17 @@ export default async function ArtistPage({
                         <span key={m} className="tag tag-medium">
                           {m}
                         </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {artist.concepts?.length > 0 && (
+                  <div className="info-row">
+                    <span className="info-label">Concepts</span>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: "0.3rem", marginTop: "0.3rem" }}>
+                      {artist.concepts.map((c) => (
+                        <span key={c} className="tag tag-concept">{c}</span>
                       ))}
                     </div>
                   </div>

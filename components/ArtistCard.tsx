@@ -132,22 +132,21 @@ export default function ArtistCard({ artist }: { artist: Artist }) {
               WebkitLineClamp: 2,
               WebkitBoxOrient: "vertical",
               overflow: "hidden",
-              marginBottom: artist.mediums?.length > 0 ? "0.6rem" : 0,
+              marginBottom: "0.6rem",
             }}
           >
             {artist.bio}
           </p>
         )}
 
-        {artist.mediums?.length > 0 && (
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "0.3rem" }}>
-            {artist.mediums.slice(0, 3).map((m) => (
-              <span key={m} className="tag tag-medium">
-                {m}
-              </span>
-            ))}
-          </div>
-        )}
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "0.3rem" }}>
+          {artist.mediums?.slice(0, 2).map((m) => (
+            <span key={m} className="tag tag-medium">{m}</span>
+          ))}
+          {artist.concepts?.slice(0, 2).map((c) => (
+            <span key={c} className="tag tag-concept">{c}</span>
+          ))}
+        </div>
       </div>
     </Link>
   );

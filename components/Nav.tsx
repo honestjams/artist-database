@@ -68,6 +68,15 @@ export default function Nav() {
           }}>Browse</Link>
 
           {isAdmin && (
+            <Link href="/admin" style={{
+              color: pathname === "/admin" ? "var(--text-1)" : "var(--text-2)",
+              fontSize: "0.85rem", fontWeight: 500, textDecoration: "none",
+              padding: "0.45rem 0.9rem", borderRadius: 8,
+              background: pathname === "/admin" ? "rgba(255,255,255,0.07)" : "transparent",
+              transition: "background 0.15s ease, color 0.15s ease",
+            }}>Admin</Link>
+          )}
+          {isAdmin && (
             <Link href="/add-artist" className="btn-ghost" style={{ fontSize: "0.82rem", padding: "0.4rem 0.85rem" }}>
               + Add Artist
             </Link>

@@ -255,6 +255,12 @@ select.input-dark {
   border: 1px solid rgba(122, 155, 106, 0.2);
 }
 
+.tag-concept {
+  background: rgba(138, 110, 210, 0.14);
+  color: #c4b0f0;
+  border: 1px solid rgba(138, 110, 210, 0.2);
+}
+
 /* ─── Skeleton loader ────────────────────────────── */
 @keyframes shimmer {
   0% { background-position: -800px 0; }
